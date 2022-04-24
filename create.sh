@@ -8,7 +8,7 @@ qemu-img create -b $(realpath ${DATA_DIR}/template/debian-11-amd64.qcow2) -f qco
   -F qcow2 ${DATA_DIR}/vms/${VM_NAME}/${VM_NAME}.qcow2 16G
 
 echo "instance-id: ${VM_NAME}
-local-hostname:${VM_NAME}
+local-hostname: ${VM_NAME}
 " > ${DATA_DIR}/vms/${VM_NAME}/metadata.yaml
 
 echo "#cloud-config
