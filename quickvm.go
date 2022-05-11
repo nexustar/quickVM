@@ -24,8 +24,9 @@ type CreateOpt struct {
 }
 
 type RunOpt struct {
-	Name        string
-	PortForward []PortForward
+	Name           string
+	PortForward    []PortForward
+	AdditionalArgs []string
 }
 
 type PortForward struct {
@@ -72,6 +73,7 @@ func Run(opt RunOpt) error {
 		"-drive", "if=virtio,format=qcow2,file=" + filepath.Join(vmDir, opt.Name+".qcow2"),
 		"-drive", "if=virtio,format=raw,file=" + filepath.Join(vmDir, "seed.img"),
 	}
+	args = append(args, opt.AdditionalArgs...)
 
 	cmd := exec.Command(binPath, args...)
 	cmd.Env = os.Environ()

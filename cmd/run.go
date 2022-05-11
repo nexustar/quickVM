@@ -19,12 +19,13 @@ var runCmd = &cobra.Command{
 		cobra.CheckErr(err)
 		fmt.Println("port forward table:")
 		fmt.Println("protocol\thost port\tport")
-		for _,p := range portsMap{
+		for _, p := range portsMap {
 			fmt.Printf("%s\t\t%d\t\t%d\n", p.Protocol, p.HostPort, p.Port)
 		}
 		ropt := quickvm.RunOpt{
-			Name:        args[0],
-			PortForward: portsMap,
+			Name:           args[0],
+			PortForward:    portsMap,
+			AdditionalArgs: args[1:],
 		}
 		cobra.CheckErr(quickvm.Run(ropt))
 	},
