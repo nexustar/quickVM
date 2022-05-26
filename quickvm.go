@@ -102,8 +102,18 @@ func ParserOptPublish(ports []string) ([]PortForward, error) {
 			if err != nil {
 				return nil, err
 			}
-			// random hostport
-			fwd.HostPort = 0
+			l, err := net.Listen(fwd.Protocol, fmt.Sprintf("localhost:%d", fwd.Port))
+			if err == nil {
+				l.Close()
+				fwd.HostPort = fwd.Port
+			} else {
+				l, err = net.Listen(fwd.Protocol, fmt.Sprintf("localhost:0"))
+				if err != nil {
+					return nil, err
+				}
+				l.Close()
+				fwd.HostPort = l.Addr().(*net.TCPAddr).Port
+			}
 		case 2:
 			fwd.HostPort, err = strconv.Atoi(split[0])
 			if err != nil {
@@ -113,16 +123,15 @@ func ParserOptPublish(ports []string) ([]PortForward, error) {
 			if err != nil {
 				return nil, err
 			}
+			l, err := net.Listen(fwd.Protocol, fmt.Sprintf("localhost:%d", fwd.HostPort))
+			if err != nil {
+				return nil, err
+			}
+			l.Close()
 		default:
 			return nil, fmt.Errorf("cannot parser %s", p)
 		}
 
-		l, err := net.Listen(fwd.Protocol, fmt.Sprintf("localhost:%d", fwd.HostPort))
-		if err != nil {
-			return nil, err
-		}
-		l.Close()
-		fwd.HostPort = l.Addr().(*net.TCPAddr).Port
 		portfwds = append(portfwds, fwd)
 	}
 	return portfwds, nil
