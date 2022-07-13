@@ -25,6 +25,8 @@ type CreateOpt struct {
 
 type RunOpt struct {
 	Name           string
+	Cpu            int
+	Memory         string
 	PortForward    []PortForward
 	AdditionalArgs []string
 }
@@ -55,6 +57,13 @@ func Run(opt RunOpt) error {
 		arch = "aarch64"
 	}
 
+	if opt.Cpu == 0 {
+		opt.Cpu = runtime.NumCPU()
+		if opt.Cpu < 1 {
+			opt.Cpu = 1
+		}
+	}
+
 	var portfwd string
 	for _, p := range opt.PortForward {
 		portfwd = portfwd + fmt.Sprintf(",hostfwd=%s::%d-:%d", p.Protocol, p.HostPort, p.Port)
@@ -66,7 +75,8 @@ func Run(opt RunOpt) error {
 		"-machine",
 		"accel=kvm,type=q35",
 		"-cpu", "host",
-		"-m", "4G",
+		"-smp", strconv.Itoa(opt.Cpu),
+		"-m", opt.Memory,
 		"-nographic",
 		"-device", "virtio-net-pci,netdev=net0",
 		"-netdev", "user,id=net0" + portfwd,
